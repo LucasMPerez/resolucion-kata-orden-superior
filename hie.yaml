@@ -1,0 +1,7 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "kata-orden-superior:lib"
+
+    - path: "./test"
+      component: "kata-orden-superior:test:kata-orden-superior-test"
