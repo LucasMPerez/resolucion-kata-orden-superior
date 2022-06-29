@@ -38,36 +38,33 @@ terceraCasa = Casa {
   garage = True,
   habitantes = [Persona "wilson" 71, Persona "lourdes" 25]
 }
-
 casas = [unaCasa, otraCasa, terceraCasa]
 
 -- Saber si una casa es grande, que es cuando todas las habitaciones miden más de 4 metros cuadrados
 -- unaCasa es grande, mientras que otraCasa y terceraCasa no lo son
 casaGrande :: Casa -> Bool
-casaGrande  = all esHabitacionGrande . habitaciones 
+casaGrande casa = all habitacionGrande (habitaciones casa)
 
-esHabitacionGrande :: Habitacion -> Bool 
-esHabitacionGrande habitacion = ( (>4) . volumen) habitacion
-
-volumen :: Habitacion -> Number 
--- volumen habitacion = ancho habitacion * largo habitacion * alto habitacion
-volumen (Habitacion alto ancho largo) = alto * ancho * largo
+habitacionGrande :: Habitacion -> Bool
+habitacionGrande habitacion = ((>=4).(*ancho habitacion).largo) habitacion
 
 -- (con fold) Queremos saber la lista de personas que viven en una casa armando una cadena
 -- de caracteres contiguo
 -- P. ej: si preguntamos quiénes viven en unaCasa nos tiene que responder "juanceciliasantifede"
 quienesViven :: Casa -> String
-quienesViven casa = (foldl (flip ((++).nombre)) ""  . habitantes ) casa
+quienesViven casa = foldl1 (++) (map nombre (habitantes casa))
 
-quienesViven' casa = (foldr ((++).nombre)  "".habitantes) casa
 
 -- Saber el total en metros cuadrados de las casas que tienen habitantes mayores de 45
 -- Si le pasamos las tres casas, el total es 66 = 24 + 42 de la otraCasa y terceraCasa
-tamanioCasaConPersonasMayores ::  [Casa] -> Number
-tamanioCasaConPersonasMayores casas = ( sumOf volumenTotal  .filter tienePersonasMayores ) casas
+--tamanioCasaConPersonasMayores :: [Casa] -> [Casa]
+--tamanioCasaConPersonasMayores listadoCasas = filter ((>45).edad.habitantes) listadoCasas
 
-volumenTotal :: Casa -> Number
-volumenTotal = sumOf volumen . habitaciones
+casasConPersonasMayores :: [Casa] -> Number
+casasConPersonasMayores listadoCasas = sum (map sumaMetrosCuadrados (filter tieneHabitantesMayores listadoCasas))
 
-tienePersonasMayores :: Casa -> Bool 
-tienePersonasMayores casa = (any ((>45).edad) . habitantes) casa 
+tieneHabitantesMayores :: Casa -> Bool
+tieneHabitantesMayores casa = any ((>45).edad) (habitantes casa)
+
+sumaMetrosCuadrados :: Casa -> Number
+sumaMetrosCuadrados casa = sum (map (\habitacion -> ((* ancho habitacion).largo) habitacion) (habitaciones casa))
